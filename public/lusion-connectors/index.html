@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lusion Connectors — pmndrs examples</title>
+    <script type="module" crossorigin src="./assets/index-Bm0SHfPu.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DAI2moYn.css">
+    <link rel="canonical" href="https://pmndrs.github.io/examples/examples/lusion-connectors" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.addEventListener('pointermove', (e) => {
+        try {
+          if (window.parent && window.parent.__onIframePointerMove) {
+            window.parent.__onIframePointerMove(e.clientX, e.clientY);
+          }
+        } catch (err) {}
+      });
+      window.addEventListener('pointerenter', () => {
+        try {
+          if (window.parent && window.parent.__onIframePointerEnter) {
+            window.parent.__onIframePointerEnter();
+          }
+        } catch (err) {}
+      });
+      window.addEventListener('pointerleave', () => {
+        try {
+          if (window.parent && window.parent.__onIframePointerLeave) {
+            window.parent.__onIframePointerLeave();
+          }
+        } catch (err) {}
+      });
+      window.addEventListener('pointerdown', () => {
+        try {
+          if (window.parent && window.parent.__onIframePointerDown) {
+            window.parent.__onIframePointerDown();
+          }
+        } catch (err) {}
+      });
+      window.addEventListener('pointerup', () => {
+        try {
+          if (window.parent && window.parent.__onIframePointerUp) {
+            window.parent.__onIframePointerUp();
+          }
+        } catch (err) {}
+      });
+    </script>
+  </body>
+</html>
