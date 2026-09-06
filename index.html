@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lusion - Award Winning 3D and Interactive Web Studio (Replica)</title>
   <meta name="description" content="We design and produce 3D visual storytelling, immersive websites, and interactive digital experiences that help brands stand out online." />
   <link rel="icon" type="image/png" href="/assets/projects/oryzo_ai/home.webp" />
@@ -13,25 +13,6 @@
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
-  <!-- WebGL 3D Background Canvas -->
-  <canvas id="canvas"></canvas>
-
-  <!-- Custom Smooth Cursor -->
-  <div id="custom-cursor">
-    <div id="cursor-dot"></div>
-    <div id="cursor-ring">
-      <span id="cursor-text"></span>
-      <div id="cursor-hand-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
-          <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
-          <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
-          <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-
   <!-- UI Overlay -->
   <div id="ui">
     <!-- Header -->
@@ -51,10 +32,10 @@
 
         <!-- Right Controls: Sound, Let's Talk, Menu -->
         <div id="header-right">
-          <!-- Sound Toggle with Minimal Dash Icon (Matching Screenshot) -->
-          <button id="header-right-sound-btn" class="magnetic-btn" aria-label="Toggle Sound" data-cursor="SOUND">
+          <!-- Sound Toggle: idle dash, animated waveform when enabled -->
+          <button id="header-right-sound-btn" class="magnetic-btn" aria-label="Toggle Sound" aria-pressed="false" data-cursor="SOUND">
             <span id="sound-dash">—</span>
-            <canvas id="sound-canvas" width="28" height="14" style="display: none;"></canvas>
+            <canvas id="sound-canvas" width="64" height="36" aria-hidden="true"></canvas>
           </button>
 
           <!-- Let's talk Dark Pill Button (Matching Screenshot) -->
@@ -64,7 +45,7 @@
           </a>
 
           <!-- Menu Light Pill Button (Matching Screenshot) -->
-          <button id="header-right-menu-btn" class="magnetic-btn" aria-label="Menu button" data-cursor="MENU">
+          <button id="header-right-menu-btn" class="magnetic-btn" aria-label="Open navigation" aria-controls="header-menu" aria-expanded="false" data-cursor="MENU">
             <div id="header-right-menu-btn-inner">
               <span id="header-right-menu-btn-text">MENU</span>
               <span id="header-right-menu-btn-text-close">CLOSE</span>
@@ -78,39 +59,39 @@
       </div>
     </header>
 
-    <!-- Fullscreen Overlay Menu -->
-    <div id="header-menu">
+    <!-- Modular floating menu -->
+    <div id="header-menu" aria-hidden="true">
       <div id="header-menu-bg"></div>
       <div id="header-menu-content">
-        <div id="header-menu-links">
-          <a class="header-menu-link" href="#home-hero" data-cursor="CLICK">
+        <nav id="header-menu-links" aria-label="Primary navigation">
+          <a class="header-menu-link is-current" href="#home-hero" data-cursor="CLICK" aria-current="page">
             <div class="header-menu-link-inner">
-              <span class="link-text-original">Home</span>
-              <span class="link-text-hover">Home</span>
+              <span class="header-menu-link-label">Home</span>
+              <span class="header-menu-link-status" aria-hidden="true"><span class="menu-status-dot"></span><span class="menu-status-arrow">→</span></span>
             </div>
           </a>
           <a class="header-menu-link" href="#home-reel" data-cursor="CLICK">
             <div class="header-menu-link-inner">
-              <span class="link-text-original">About us</span>
-              <span class="link-text-hover">About us</span>
+              <span class="header-menu-link-label">About us</span>
+              <span class="header-menu-link-status" aria-hidden="true"><span class="menu-status-dot"></span><span class="menu-status-arrow">→</span></span>
             </div>
           </a>
           <a class="header-menu-link" href="#home-featured" data-cursor="CLICK">
             <div class="header-menu-link-inner">
-              <span class="link-text-original">Projects</span>
-              <span class="link-text-hover">Projects</span>
+              <span class="header-menu-link-label">Projects</span>
+              <span class="header-menu-link-status" aria-hidden="true"><span class="menu-status-dot"></span><span class="menu-status-arrow">→</span></span>
             </div>
           </a>
           <a class="header-menu-link" href="#footer-section" data-cursor="CLICK">
             <div class="header-menu-link-inner">
-              <span class="link-text-original">Contact</span>
-              <span class="link-text-hover">Contact</span>
+              <span class="header-menu-link-label">Contact</span>
+              <span class="header-menu-link-status" aria-hidden="true"><span class="menu-status-dot"></span><span class="menu-status-arrow">→</span></span>
             </div>
           </a>
-        </div>
+        </nav>
 
         <div id="header-menu-footer">
-          <div id="header-menu-newsletter">
+          <div id="header-menu-newsletter" class="menu-card">
             <div id="header-menu-newsletter-title">
               <div class="header-menu-newsletter-title-line">Subscribe to</div>
               <div class="header-menu-newsletter-title-line">our newsletter</div>
@@ -125,7 +106,7 @@
             </form>
           </div>
 
-          <a id="header-menu-labs" href="https://labs.lusion.co/" target="_blank" rel="noopener" data-cursor="LABS">
+          <a id="header-menu-labs" class="menu-card" href="https://labs.lusion.co/" target="_blank" rel="noopener" data-cursor="LABS">
             <div id="header-menu-labs-inner">
               <span id="header-menu-labs-text">Labs R&D</span>
               <span id="header-menu-labs-arrow">↗</span>
@@ -218,7 +199,7 @@
               <div id="home-reel-body">
                 <!-- Left Interactive Morphing Project Card -->
                 <div id="home-reel-card-wrapper">
-                  <div id="home-reel-card" class="magnetic-btn" data-cursor="PLAY">
+                  <button id="home-reel-card" type="button" data-cursor="PLAY" aria-label="Play showreel">
                     <!-- Layer 1: Soda Experience (Image 1) -->
                     <div class="reel-card-layer reel-card-soda" style="background-image: url('/assets/projects/soda_experience/home.webp');">
                       <div class="card-browser-mockup">
@@ -230,7 +211,10 @@
                     <!-- Layer 2: Choo Choo World (Image 2) -->
                     <div class="reel-card-layer reel-card-choo" style="background-image: url('/assets/projects/choo_choo_world/home.webp');"></div>
                     <div class="reel-card-overlay"></div>
-                  </div>
+                    <span class="reel-card-play-label" aria-hidden="true">
+                      <span>PLAY</span><span class="reel-card-play-disc">▶</span><span>REEL</span>
+                    </span>
+                  </button>
                 </div>
 
                 <!-- Right Description & "• OUR APPROACH" -->
@@ -263,7 +247,7 @@
             <!-- Project Grid -->
             <div class="project-list">
               <!-- 1. Oryzo AI -->
-              <div class="project-item" data-id="oryzo_ai" data-color="#1a1411" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="oryzo_ai" data-color="#1a1411" data-cursor="VIEW" aria-label="Oryzo AI project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/oryzo_ai/home.webp" alt="Oryzo AI" loading="lazy" />
@@ -276,10 +260,10 @@
                     <span class="project-item-line-2-inner">Oryzo AI</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 2. Atlas Motion -->
-              <div class="project-item" data-id="atlas_motion" data-color="#181818" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="atlas_motion" data-color="#181818" data-cursor="VIEW" aria-label="Atlas Motion project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/atlas_motion/home.webp" alt="Atlas Motion" loading="lazy" />
@@ -292,10 +276,10 @@
                     <span class="project-item-line-2-inner">Atlas Motion</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 3. Devin AI -->
-              <div class="project-item" data-id="devin_ai" data-color="#0f1423" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="devin_ai" data-color="#0f1423" data-cursor="VIEW" aria-label="Devin AI project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/devin_ai/home.webp" alt="Devin AI" loading="lazy" />
@@ -308,10 +292,10 @@
                     <span class="project-item-line-2-inner">Devin AI</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 4. Of The Oak -->
-              <div class="project-item" data-id="of_the_oak" data-color="#131e18" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="of_the_oak" data-color="#131e18" data-cursor="VIEW" aria-label="Of The Oak project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/of_the_oak/home.webp" alt="Of The Oak" loading="lazy" />
@@ -324,10 +308,10 @@
                     <span class="project-item-line-2-inner">Of The Oak</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 5. Everswap -->
-              <div class="project-item" data-id="everswap" data-color="#151228" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="everswap" data-color="#151228" data-cursor="VIEW" aria-label="Everswap project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/everswap/home.webp" alt="Everswap" loading="lazy" />
@@ -340,10 +324,10 @@
                     <span class="project-item-line-2-inner">Everswap</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 6. Porsche: Dream Machine -->
-              <div class="project-item" data-id="porsche_dream_machine" data-color="#241314" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="porsche_dream_machine" data-color="#241314" data-cursor="VIEW" aria-label="Porsche Dream Machine project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/porsche_dream_machine/home.webp" alt="Porsche: Dream Machine" loading="lazy" />
@@ -356,10 +340,10 @@
                     <span class="project-item-line-2-inner">Porsche: Dream Machine</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 7. Synthetic Human -->
-              <div class="project-item" data-id="synthetic_human" data-color="#1b1c22" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="synthetic_human" data-color="#1b1c22" data-cursor="VIEW" aria-label="Synthetic Human project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/synthetic_human/home.webp" alt="Synthetic Human" loading="lazy" />
@@ -372,10 +356,10 @@
                     <span class="project-item-line-2-inner">Synthetic Human</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 8. Meta: Spatial Fusion -->
-              <div class="project-item" data-id="spatial_fusion" data-color="#101c29" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="spatial_fusion" data-color="#101c29" data-cursor="VIEW" aria-label="Meta Spatial Fusion project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/spatial_fusion/home.webp" alt="Spatial Fusion" loading="lazy" />
@@ -388,10 +372,10 @@
                     <span class="project-item-line-2-inner">Meta: Spatial Fusion</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 9. Spaace -->
-              <div class="project-item" data-id="spaace" data-color="#191522" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="spaace" data-color="#191522" data-cursor="VIEW" aria-label="Spaace project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/spaace/home.webp" alt="Spaace" loading="lazy" />
@@ -404,10 +388,10 @@
                     <span class="project-item-line-2-inner">Spaace</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 10. DDD 2024 -->
-              <div class="project-item" data-id="ddd_2024" data-color="#241b12" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="ddd_2024" data-color="#241b12" data-cursor="VIEW" aria-label="DDD 2024 project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/ddd_2024/home.webp" alt="DDD 2024" loading="lazy" />
@@ -420,10 +404,10 @@
                     <span class="project-item-line-2-inner">DDD 2024</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 11. Choo Choo World -->
-              <div class="project-item" data-id="choo_choo_world" data-color="#16221c" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="choo_choo_world" data-color="#16221c" data-cursor="VIEW" aria-label="Choo Choo World project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/choo_choo_world/home.webp" alt="Choo Choo World" loading="lazy" />
@@ -436,10 +420,10 @@
                     <span class="project-item-line-2-inner">Choo Choo World</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- 12. Soda Experience -->
-              <div class="project-item" data-id="soda_experience" data-color="#211824" data-cursor="VIEW">
+              <a class="project-item" href="#project-placeholder" data-id="soda_experience" data-color="#211824" data-cursor="VIEW" aria-label="Soda Experience project — coming soon">
                 <div class="project-item-main">
                   <div class="project-item-image-wrapper">
                     <img class="project-item-image" src="/assets/projects/soda_experience/home.webp" alt="Soda Experience" loading="lazy" />
@@ -452,7 +436,7 @@
                     <span class="project-item-line-2-inner">Soda Experience</span>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </section>
 
@@ -575,7 +559,9 @@
     </div>
 
     <!-- Video Modal Player -->
-    <div id="video-modal" class="modal">
+    <span id="project-placeholder" class="sr-only" tabindex="-1" aria-live="polite">Project details coming soon.</span>
+
+    <div id="video-modal" class="modal" role="dialog" aria-modal="true" aria-label="Lusion showreel" aria-hidden="true">
       <div id="modal-backdrop"></div>
       <div id="modal-container">
         <button id="modal-close-btn" class="magnetic-btn" aria-label="Close video">

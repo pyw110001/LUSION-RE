@@ -3,81 +3,80 @@ import gsap from 'gsap';
 export function initCustomCursor() {
   const cursor = document.getElementById('custom-cursor');
   const cursorText = document.getElementById('cursor-text');
-  if (!cursor) return;
+  if (!cursor || !cursorText) return;
 
-  // Use gsap.quickTo for high-performance 120fps mouse follower as instructed by gsap-performance
-  const xTo = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3.out" });
-  const yTo = gsap.quickTo(cursor, "y", { duration: 0.35, ease: "power3.out" });
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion) {
+    cursor.remove();
+    document.documentElement.classList.add('native-cursor');
+    return;
+  }
 
-  window.addEventListener('pointermove', (e) => {
-    xTo(e.clientX);
-    yTo(e.clientY);
+  gsap.set(cursor, { x: -120, y: -120, autoAlpha: 0 });
+  const xTo = gsap.quickTo(cursor, 'x', { duration: 0.28, ease: 'power3.out' });
+  const yTo = gsap.quickTo(cursor, 'y', { duration: 0.28, ease: 'power3.out' });
+  let hasMoved = false;
+
+  function revealCursor() {
+    if (!hasMoved) {
+      hasMoved = true;
+      document.documentElement.classList.add('custom-cursor-ready');
+      gsap.to(cursor, { autoAlpha: 1, duration: 0.18 });
+    }
+  }
+
+  function moveCursor(x, y) {
+    revealCursor();
+    xTo(x);
+    yTo(y);
+  }
+
+  function hideCursor() {
+    hasMoved = false;
+    document.documentElement.classList.remove('custom-cursor-ready');
+    gsap.to(cursor, { autoAlpha: 0, duration: 0.12 });
+  }
+
+  window.addEventListener('pointermove', (event) => {
+    if (event.pointerType !== 'touch') moveCursor(event.clientX, event.clientY);
+  }, { passive: true });
+  window.addEventListener('pointerdown', () => document.body.classList.add('cursor-mouse-down'));
+  window.addEventListener('pointerup', () => document.body.classList.remove('cursor-mouse-down'));
+  window.addEventListener('blur', hideCursor);
+  document.addEventListener('pointerleave', (event) => {
+    if (!event.relatedTarget) hideCursor();
   });
 
-  window.addEventListener('mousedown', () => {
-    document.body.classList.add('cursor-mouse-down');
-  });
-
-  window.addEventListener('mouseup', () => {
-    document.body.classList.remove('cursor-mouse-down');
-  });
-
-  // Direct seamless bridge for 3D iframe pointer tracking
-  window.__onIframePointerMove = (iframeX, iframeY) => {
-    const iframe = document.getElementById('hero-connectors-iframe');
-    if (!iframe) return;
-    const rect = iframe.getBoundingClientRect();
-    xTo(rect.left + iframeX);
-    yTo(rect.top + iframeY);
+  window.__onIframePointerMove = (x, y, viewportCoordinates = false) => {
+    if (viewportCoordinates) {
+      moveCursor(x, y);
+    } else {
+      const rect = document.getElementById('hero-connectors-iframe')?.getBoundingClientRect();
+      if (rect) moveCursor(rect.left + x, rect.top + y);
+    }
     cursorText.textContent = '';
     document.body.classList.add('cursor-hover-active', 'cursor-dark-theme', 'cursor-is-hand');
   };
-
   window.__onIframePointerEnter = () => {
     cursorText.textContent = '';
     document.body.classList.add('cursor-hover-active', 'cursor-dark-theme', 'cursor-is-hand');
   };
-
   window.__onIframePointerLeave = () => {
     document.body.classList.remove('cursor-hover-active', 'cursor-dark-theme', 'cursor-is-hand', 'cursor-mouse-down');
   };
+  window.__onIframePointerDown = () => document.body.classList.add('cursor-mouse-down');
+  window.__onIframePointerUp = () => document.body.classList.remove('cursor-mouse-down');
 
-  window.__onIframePointerDown = () => {
-    document.body.classList.add('cursor-mouse-down');
-  };
-
-  window.__onIframePointerUp = () => {
-    document.body.classList.remove('cursor-mouse-down');
-  };
-
-  // Track hover elements with data-cursor
-  const interactiveElements = document.querySelectorAll('[data-cursor], a, button, .project-item');
-
-  interactiveElements.forEach((el) => {
-    el.addEventListener('mouseenter', () => {
-      const cursorType = el.getAttribute('data-cursor') || 'VIEW';
-      
-      if (cursorType === 'HAND') {
-        cursorText.textContent = '';
-        document.body.classList.add('cursor-hover-active', 'cursor-is-hand', 'cursor-dark-theme');
-      } else {
-        cursorText.textContent = cursorType;
-        document.body.classList.add('cursor-hover-active');
-        document.body.classList.remove('cursor-is-hand');
-        
-        if (el.closest('#hero-window-container') || el.closest('#video-modal')) {
-          document.body.classList.add('cursor-dark-theme');
-        } else {
-          document.body.classList.remove('cursor-dark-theme');
-        }
-      }
-
-      if (cursorType === 'SOUND') {
-        document.body.classList.add('cursor-hover-sound');
-      }
+  document.querySelectorAll('[data-cursor], a, button, .project-item').forEach((element) => {
+    element.addEventListener('mouseenter', () => {
+      const label = element.getAttribute('data-cursor') || 'VIEW';
+      cursorText.textContent = label === 'HAND' ? '' : label;
+      document.body.classList.add('cursor-hover-active');
+      document.body.classList.toggle('cursor-is-hand', label === 'HAND');
+      document.body.classList.toggle('cursor-dark-theme', Boolean(element.closest('#hero-window-container, #video-modal')));
+      document.body.classList.toggle('cursor-hover-sound', label === 'SOUND');
     });
-
-    el.addEventListener('mouseleave', () => {
+    element.addEventListener('mouseleave', () => {
       cursorText.textContent = '';
       document.body.classList.remove('cursor-hover-active', 'cursor-hover-sound', 'cursor-dark-theme', 'cursor-is-hand');
     });

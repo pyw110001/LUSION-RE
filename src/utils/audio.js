@@ -12,6 +12,7 @@ export class AudioManager {
     }
 
     if (this.soundBtn) {
+      this.soundBtn.setAttribute('aria-pressed', 'false');
       this.soundBtn.addEventListener('click', this.toggleSound.bind(this));
     }
   }
@@ -55,6 +56,8 @@ export class AudioManager {
 
   toggleSound() {
     this.isEnabled = !this.isEnabled;
+    this.soundBtn?.classList.toggle('is-enabled', this.isEnabled);
+    this.soundBtn?.setAttribute('aria-pressed', String(this.isEnabled));
     this.initAudio();
 
     if (this.isEnabled) {
@@ -64,41 +67,40 @@ export class AudioManager {
   }
 
   initVisualizer() {
-    const bars = 4;
-    const barWidth = 3;
-    const gap = 3;
     let t = 0;
 
     const render = () => {
       requestAnimationFrame(render);
-      t += 0.08;
+      t += this.isEnabled ? 0.065 : 0.018;
 
       const w = this.canvas.width;
       const h = this.canvas.height;
       this.ctx.clearRect(0, 0, w, h);
+      if (!this.isEnabled) return;
 
-      const totalWidth = bars * barWidth + (bars - 1) * gap;
-      const startX = (w - totalWidth) / 2;
+      const inset = 7;
+      const centerY = h / 2;
+      const width = w - inset * 2;
+      const amplitude = h * (0.23 + Math.sin(t * 0.8) * 0.025);
 
-      for (let i = 0; i < bars; i++) {
-        let barHeight;
-        if (this.isEnabled) {
-          // Dynamic dancing bars when sound is ON
-          barHeight = 4 + (Math.sin(t * 2 + i * 1.5) * 0.5 + 0.5) * 12;
-          this.ctx.fillStyle = '#c1ff00'; // Lusion Acid Lime
-        } else {
-          // Subtle idle static bars when OFF
-          barHeight = 4 + (Math.sin(t * 0.5 + i) * 0.5 + 0.5) * 3;
-          this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        }
+      this.ctx.beginPath();
+      for (let i = 0; i <= 48; i++) {
+        const progress = i / 48;
+        const x = inset + progress * width;
+        const envelope = Math.pow(Math.sin(Math.PI * progress), 0.55);
+        const harmonic = Math.sin(progress * Math.PI * 3.15 + t);
+        const detail = Math.sin(progress * Math.PI * 6.3 - t * 0.7) * 0.12;
+        const y = centerY + (harmonic + detail) * amplitude * envelope;
 
-        const x = startX + i * (barWidth + gap);
-        const y = (h - barHeight) / 2;
-
-        this.ctx.beginPath();
-        this.ctx.roundRect(x, y, barWidth, barHeight, 2);
-        this.ctx.fill();
+        if (i === 0) this.ctx.moveTo(x, y);
+        else this.ctx.lineTo(x, y);
       }
+
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.lineWidth = 5;
+      this.ctx.lineCap = 'round';
+      this.ctx.lineJoin = 'round';
+      this.ctx.stroke();
     };
 
     render();

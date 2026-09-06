@@ -1,62 +1,104 @@
 import gsap from 'gsap';
 
 export function initMenu() {
-  const menuBtn = document.getElementById('header-right-menu-btn');
+  const button = document.getElementById('header-right-menu-btn');
   const menu = document.getElementById('header-menu');
-  const menuBg = document.getElementById('header-menu-bg');
-  const menuLinks = document.querySelectorAll('.header-menu-link');
-  const menuFooter = document.getElementById('header-menu-footer');
-  if (!menuBtn || !menu) return;
+  const panels = menu?.querySelectorAll('#header-menu-links, #header-menu-newsletter, #header-menu-labs');
+  const links = menu?.querySelectorAll('a, input, button');
+  const navigationLinks = [...(menu?.querySelectorAll('.header-menu-link') || [])];
+  if (!button || !menu || !panels) return;
 
   let isOpen = false;
+  let scrollTicking = false;
 
-  // Build master menu timeline as recommended by gsap-timeline
-  const menuTl = gsap.timeline({
+  function setCurrentLink(currentLink) {
+    navigationLinks.forEach((link) => {
+      const isCurrent = link === currentLink;
+      link.classList.toggle('is-current', isCurrent);
+      if (isCurrent) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
+  function updateCurrentLink() {
+    let currentLink = navigationLinks[0];
+    const threshold = window.innerHeight * 0.45;
+
+    navigationLinks.forEach((link) => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target && target.getBoundingClientRect().top <= threshold) currentLink = link;
+    });
+
+    setCurrentLink(currentLink);
+    scrollTicking = false;
+  }
+
+  gsap.set(menu, { autoAlpha: 0, pointerEvents: 'none' });
+  gsap.set(panels, { y: -18, autoAlpha: 0, scale: 0.98 });
+
+  const timeline = gsap.timeline({
     paused: true,
-    defaults: { duration: 0.6, ease: "power3.out" },
+    defaults: { ease: 'power3.out' },
     onReverseComplete: () => {
       menu.classList.remove('is-open');
-      document.body.classList.remove('menu-active');
-    }
-  });
-
-  menuTl
+      menu.setAttribute('aria-hidden', 'true');
+      gsap.set(menu, { pointerEvents: 'none' });
+    },
+  })
     .set(menu, { autoAlpha: 1, pointerEvents: 'auto' })
-    .to(menuBg, {
-      yPercent: 100,
-      duration: 0.7,
-      ease: "power4.inOut"
-    })
-    .fromTo(
-      menuLinks,
-      { yPercent: 100, autoAlpha: 0 },
-      { yPercent: 0, autoAlpha: 1, stagger: 0.08, duration: 0.7, ease: "power3.out" },
-      "-=0.3"
-    )
-    .fromTo(
-      menuFooter,
-      { autoAlpha: 0, y: 20 },
-      { autoAlpha: 1, y: 0, duration: 0.5 },
-      "-=0.2"
-    );
+    .to(panels, { y: 0, autoAlpha: 1, scale: 1, duration: 0.55, stagger: 0.055 }, 0);
 
-  function toggleMenu() {
-    isOpen = !isOpen;
+  function setOpen(nextOpen, restoreFocus = false) {
+    isOpen = nextOpen;
+    button.setAttribute('aria-expanded', String(isOpen));
+    button.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    document.body.classList.toggle('menu-active', isOpen);
+
     if (isOpen) {
+      updateCurrentLink();
       menu.classList.add('is-open');
-      document.body.classList.add('menu-active');
-      menuTl.play();
+      menu.setAttribute('aria-hidden', 'false');
+      timeline.play();
+      window.setTimeout(() => links?.[0]?.focus(), 160);
     } else {
-      menuTl.reverse();
+      timeline.reverse();
+      if (restoreFocus) button.focus();
     }
   }
 
-  menuBtn.addEventListener('click', toggleMenu);
+  button.addEventListener('click', () => setOpen(!isOpen));
 
-  // Close menu when clicking any menu link
-  menuLinks.forEach((link) => {
+  navigationLinks.forEach((link) => {
     link.addEventListener('click', () => {
-      if (isOpen) toggleMenu();
+      setCurrentLink(link);
+      setOpen(false);
     });
+  });
+
+  window.addEventListener('scroll', () => {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(updateCurrentLink);
+  }, { passive: true });
+
+  updateCurrentLink();
+
+  window.addEventListener('keydown', (event) => {
+    if (!isOpen) return;
+    if (event.key === 'Escape') {
+      setOpen(false, true);
+      return;
+    }
+    if (event.key !== 'Tab' || !links?.length) return;
+
+    const first = links[0];
+    const last = links[links.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 }
